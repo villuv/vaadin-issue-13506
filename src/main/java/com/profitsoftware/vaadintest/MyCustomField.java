@@ -6,6 +6,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 
 public class MyCustomField extends CustomField<MyCustomType> {
   private MyCustomType value;
@@ -22,6 +23,7 @@ public class MyCustomField extends CustomField<MyCustomType> {
     fieldLayout = new HorizontalLayout();
     fieldLayout.setSizeUndefined();
     typeField = new ComboBox();
+    typeField.setNullSelectionAllowed(false);
     typeField.addItem("Narrow");
     typeField.addItem("Wide");
     typeField.setWidth("90px");
@@ -34,6 +36,13 @@ public class MyCustomField extends CustomField<MyCustomType> {
           valueField.setWidth("20px");
         } else {
           valueField.setWidth("120px");
+        }
+        if(value != null && !type.equals(value.getType())) {
+          //valuechanged
+          value.setType(type);
+          AppUI ui = (AppUI)UI.getCurrent();
+          ui.refreshColumnWidth("myType");//does not do anything if alwaysRecalculateColumnWidths = false
+          //ui.refreshColumnWidths();//does not do anything if alwaysRecalculateColumnWidths = false
         }
       }
     });

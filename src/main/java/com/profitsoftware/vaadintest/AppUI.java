@@ -3,6 +3,7 @@ package com.profitsoftware.vaadintest;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
@@ -19,28 +20,50 @@ import com.vaadin.ui.VerticalLayout;
 public class AppUI extends UI {
 
   private static final long serialVersionUID = 1L;
-
+	private Table table;
 
   public AppUI() {
     super();
   }
 
+  private void initializeColumnWidth(Object property) {
+    table.setColumnWidth(property, -1);
+  }
+
+  public void refreshColumnWidth(Object property) {
+    initializeColumnWidth(property);
+    //triggerTableSizeChange();
+  }
+
+
+
+  public void refreshColumnWidths() {
+    if (table.getVisibleColumns().length > 0) {
+      for (Object property : table.getVisibleColumns()) {
+        initializeColumnWidth(property);
+      }
+      //triggerTableSizeChange();
+    }
+  }
+
   @Override
   protected void init(VaadinRequest vaadinRequest) {
-    Table table = new Table() {
+    table = new Table() {
       private static final long serialVersionUID = 1L;
       {
         this.alwaysRecalculateColumnWidths = true;
       }
     };
-    table.setSizeFull();
+    table.setWidth("555px");// Narrow the Table width to capture the 'need for re-adjusting column width'
+    table.setHeight("100%");
     table.setPageLength(0);
 
     table.setTableFieldFactory(new TableFieldFactory() {
       @Override
       public Field<?> createField(Container container, Object itemId, Object propertyId, Component uiContext) {
         if ("myType".equals(propertyId)) {
-          return new MyCustomField((MyCustomType) container.getItem(itemId).getItemProperty(propertyId).getValue());
+          MyCustomField myCustomField = new MyCustomField((MyCustomType) container.getItem(itemId).getItemProperty(propertyId).getValue());
+          return myCustomField;
         } else {
           return DefaultFieldFactory.get().createField(container, itemId, propertyId, uiContext);
         }
