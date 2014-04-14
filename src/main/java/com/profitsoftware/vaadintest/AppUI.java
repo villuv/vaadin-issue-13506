@@ -32,17 +32,28 @@ public class AppUI extends UI {
 
   public void refreshColumnWidth(Object property) {
     initializeColumnWidth(property);
-    //triggerTableSizeChange();
+    triggerTableSizeChange();
   }
 
-
+  /* This workaround was first introduced in ( http://dev.vaadin.com/ticket/7922 ) and it seems after all it is still needed in Vaadin 7.1.12>=  */
+  private void triggerTableSizeChange() {
+    if (table.getVisibleColumns().length > 0) {
+      Object col = table.getVisibleColumns()[0];
+      boolean collapseAllowed = table.isColumnCollapsingAllowed();
+      boolean b = table.isColumnCollapsed(col);
+      table.setColumnCollapsingAllowed(true);
+      table.setColumnCollapsed(col, !b);
+      table.setColumnCollapsed(col, b);//restore original setting
+      table.setColumnCollapsingAllowed(collapseAllowed);//restore original setting
+    }
+  }
 
   public void refreshColumnWidths() {
     if (table.getVisibleColumns().length > 0) {
       for (Object property : table.getVisibleColumns()) {
         initializeColumnWidth(property);
       }
-      //triggerTableSizeChange();
+      triggerTableSizeChange();
     }
   }
 
